@@ -1,0 +1,12 @@
+{
+  "popularBooks": [
+    { "id": "1", "title": "The Hunger Games", "author": "Suzanne Collins", "imageUrl": "https://m.media-amazon.com/images/I/61I24wOsn8L._AC_UF1000,1000_QL80_.jpg" },
+    { "id": "2", "title": "Catching Fire", "author": "Suzanne Collins", "imageUrl": "https://m.media-amazon.com/images/I/51MdoLLc93L.jpg" },
+    { "id": "3", "title": "Mockingjay", "author": "Suzanne Collins", "imageUrl": "https://m.media-amazon.com/images/I/81UQRMDqbIL._AC_UF1000,1000_QL80_.jpg" }
+  ],
+  "newestBooks": [
+    { "id": "4", "title": "The Maze Runner", "author": "James Dashner", "imageUrl": "https://cdn.kobo.com/book-images/5f4afbce-f9bf-4c87-92b1-806c2f3c7b41/1200/1200/False/the-maze-runner-maze-runner-book-one.jpg", "rating": 4 },
+    { "id": "5", "title": "The Scorch Trials", "author": "James Dashner", "imageUrl": "https://cdn.kobo.com/book-images/8357ef65-05fe-4cd2-ab1e-fdbefb62d58a/1200/1200/False/the-scorch-trials-maze-runner-book-two-2.jpg", "rating": 3 },
+    { "id": "6", "title": "The Death Cure", "author": "James Dashner", "imageUrl": "https://m.media-amazon.com/images/I/91C8I7xq1xL._AC_UF1000,1000_QL80_.jpg", "rating": 5 }
+  ]
+}

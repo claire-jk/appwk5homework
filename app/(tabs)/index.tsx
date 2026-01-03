@@ -1,98 +1,137 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
+import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BookCard, { Book } from './BookCard';
+import bookData from './data.json';
+import DetailsScreen from './DetailsScreen';
+import { WishlistProvider } from './WishlistContext';
+import WishlistScreen from './WishlistScreen'; // ✅ 保留外部引入
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-export default function HomeScreen() {
+const MyBooksScreen = () => (
+  <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+    <Text>My Books (Coming Soon)</Text>
+  </View>
+);
+
+// 負責 Home 和 Details 之間的切換
+function HomeStack() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="HomeMain" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailsScreen} />
+    </Stack.Navigator>
   );
 }
 
+function HomeScreen({ navigation }: any) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity><Ionicons name="menu-outline" size={28} color="black" /></TouchableOpacity>
+        <TouchableOpacity><Ionicons name="search-outline" size={24} color="black" /></TouchableOpacity>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Text style={styles.sectionTitle}>Popular Books</Text>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={bookData.popularBooks}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <BookCard 
+              item={item as Book} 
+              onPress={() => navigation.navigate('Details', { book: item })} 
+            />
+          )}
+          contentContainerStyle={styles.listPadding}
+        />
+        
+        <Text style={styles.sectionTitle}>Newest</Text>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={bookData.newestBooks}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <BookCard 
+              item={item as Book} 
+              showRating 
+              onPress={() => navigation.navigate('Details', { book: item })} 
+            />
+          )}
+          contentContainerStyle={styles.listPadding}
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+// 這是原本的 BookApp，我們現在將它作為內層組件
+function BookAppInternal() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarActiveTintColor: '#6200EE', 
+        tabBarInactiveTintColor: 'grey',  
+        tabBarStyle: { height: 60, paddingBottom: 10 },
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: any;
+          if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
+          else if (route.name === 'Wishlist') iconName = focused ? 'bookmark' : 'bookmark-outline';
+          else if (route.name === 'My books') iconName = focused ? 'library' : 'library-outline';
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen name="Wishlist" component={WishlistScreen} />
+      <Tab.Screen name="My books" component={MyBooksScreen} />
+    </Tab.Navigator>
+  );
+}
+
+// 👉 修改最後的導出部分，加上 WishlistProvider
+export default function BookApp() {
+  return (
+    <WishlistProvider>
+        <BookAppInternal />
+    </WishlistProvider>
+  );
+}
+
+/* ---------- styles ---------- (全部保留) ---------- */
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: { flex: 1, backgroundColor: '#FFF' },
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  sectionTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginLeft: 20,
+    marginTop: 20,
+    marginBottom: 15,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  listPadding: { paddingLeft: 20 },
+  bottomTab: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#EEE',
+    paddingVertical: 10,
+    justifyContent: 'space-around',
+    backgroundColor: '#FFF',
   },
+  tabItem: { alignItems: 'center' },
+  tabText: { fontSize: 12, marginTop: 4, color: 'grey' },
 });
