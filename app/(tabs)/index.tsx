@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'; // ✅ 引入 Drawer 相關組件
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useState } from 'react';
-import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BookCard, { Book } from './BookCard';
 import bookData from './data.json';
 import DetailsScreen from './DetailsScreen';
@@ -78,7 +78,7 @@ function HomeStack() {
 
 function HomeScreen({ navigation }: any) {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container,styles.safeArea]}>
       <View style={styles.header}>
         {/* ✅ 修改：點擊漢堡圖示開啟選單 */}
         <TouchableOpacity onPress={() => navigation.openDrawer()}>
@@ -169,6 +169,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     alignItems: 'center',
+  },
+  safeArea: {
+    // ✅ Android 的 SafeAreaView 通常不起作用，需要手動補上狀態列高度
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   sectionTitle: {
     fontSize: 28,
